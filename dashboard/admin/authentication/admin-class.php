@@ -350,6 +350,17 @@ class ADMIN
         $stmt = $this->conn->prepare($sql);
         return $stmt;
     }
+
+    public function getSmtpEmail()
+    {
+        return $this->smtp_email;
+    }
+    
+    public function getSmtpPassword()
+    {
+        return $this->smtp_password;
+    }
+    
 }
 
 if (isset($_POST['btn-signup'])) {
