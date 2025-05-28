@@ -1,4 +1,11 @@
-<?php include_once 'config/settings-configuration.php'; ?>
+<?php
+session_start();
+$csrf_token = bin2hex(random_bytes(32));
+$_SESSION['csrf_token'] = $csrf_token;
+include_once 'config/settings-configuration.php';
+echo "Token from URL: " . ($_GET['token'] ?? 'No token provided');
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -16,9 +23,9 @@
                 <div class="card shadow">
                     <div class="card-body">
                         <h3 class="card-title mb-4">Reset Password</h3>
-                        <form method="POST" action="dashboard/admin/authentication/reset-password-handler.php">
+                        <form method="POST" action="process-reset-password.php">
                             <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
-                            <input type="hidden" name="token" value="<?php echo $_GET['token'] ?? ''; ?>">
+                            <input type="hidden" name="token" value="<?php echo htmlspecialchars($_GET['token'] ?? '', ENT_QUOTES); ?>">
                             <div class="mb-3">
                                 <input type="password" name="new_password" class="form-control" placeholder="New password" required>
                             </div>

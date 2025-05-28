@@ -1,4 +1,5 @@
 <?php
+session_start();
 require_once __DIR__ . '/admin-class.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btn-forgot'])) {
@@ -10,7 +11,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btn-forgot'])) {
         exit;
     }
 
-    // Create a new instance of the ADMIN class
     $admin = new ADMIN();
     $stmt = $admin->runQuery("SELECT * FROM user WHERE email = :email AND status = 'active'");
     $stmt->execute([':email' => $email]);
@@ -20,7 +20,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btn-forgot'])) {
         $token = bin2hex(random_bytes(32)); // Generate reset token
         $expiry = date('Y-m-d H:i:s', strtotime('+15 minutes')); // Token expiry (15 minutes)
 
-        // Save the token and expiry in the database
         $stmt = $admin->runQuery("UPDATE user SET reset_token = :reset_token, reset_token_expiry = :expiry WHERE email = :email");
         $stmt->execute([
             ':reset_token' => $token,
@@ -28,7 +27,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btn-forgot'])) {
             ':email' => $email
         ]);
 
-        $link = "http://{$_SERVER['HTTP_HOST']}/ARTREPO/reset-password.php?token=$token";
+        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+        $link = "{$protocol}://{$_SERVER['HTTP_HOST']}/ARTREPO/reset-password.php?token=$token";
 
         $subject = "Password Reset Request";
         $message = "
@@ -38,13 +38,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btn-forgot'])) {
             <p>This link will expire in 15 minutes. If you didn't request a reset, ignore this message.</p>
         ";
 
-        // Send email using PHPMailer
         $admin->send_email($email, $message, $subject, $admin->getSmtpEmail(), $admin->getSmtpPassword());
 
-        // Redirect the user with success message
         echo "<script>alert('Reset link sent!'); window.location.href='../../../';</script>";
     } else {
         echo "<script>alert('No active account found with that email.'); window.location.href='../../../';</script>";
     }
 }
-?>
