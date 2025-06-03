@@ -1,20 +1,5 @@
 {
-    "name": "artrepo/project",
-    "type": "project",
-    "license": "MIT",
-    "autoload": {
-        "psr-4": {
-            "Artrepo\\Project\\": "src/"
-        }
-    },
-    "authors": [
-        {
-            "name": "art",
-            "email": "artaziessamson@gmail.com"
-        }
-    ],
-    "minimum-stability": "stable",
     "require": {
-        "phpmailer/phpmailer": "^6.10"
+        "phpmailer/phpmailer": "^6.9"
     }
 }
